@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>لعبة عين الإعلام | تحديد المعارف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0f172a 0%, #0a0f1c 100%);
+            font-family: 'Segoe UI', 'Tahoma', 'Amiri', 'Cairo', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        /* حاوية اللعبة الرئيسية */
+        .game-container {
+            max-width: 1100px;
+            width: 100%;
+            background: #f8fafc;
+            border-radius: 3rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* رأس اللعبة - اللون #21417b */
+        .game-header {
+            background: #21417b;
+            padding: 1.2rem 2rem;
+            text-align: center;
+            color: white;
+            border-bottom: 4px solid #ffea9e;
+        }
+
+        .game-header h1 {
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: white;
+        }
+
+        .game-header h1 span {
+            background: #ffea9e;
+            padding: 0.2rem 0.8rem;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            color: #21417b;
+            font-weight: bold;
+        }
+
+        .sub {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 8px;
+            font-weight: 400;
+            color: #e2e8f0;
+        }
+
+        /* لوحة النقاط والتقدم - اللون #1e293b */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.8rem 2rem;
+            border-bottom: 1px solid #334155;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .score-box, .q-counter {
+            background: #0f172a;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .score-box span, .q-counter span {
+            color: #ffea9e;
+            margin-left: 6px;
+        }
+
+        .score-box, .q-counter {
+            color: white;
+        }
+
+        .reset-btn {
+            background: #ffea9e;
+            border: none;
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            color: #1e293b;
+            transition: 0.2s;
+            box-shadow: 0 3px 0 #ca8a04;
+        }
+
+        .reset-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #ca8a04;
+        }
+
+        /* محتوى السؤال */
+        .question-area {
+            padding: 2rem 2rem 1rem 2rem;
+        }
+
+        .sentence-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.5rem 1.8rem;
+            box-shadow: 0 12px 18px -10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* كتابة الاسئلة بالاسود */
+        .sentence-text {
+            font-size: 1.7rem;
+            line-height: 1.5;
+            text-align: center;
+            font-weight: 500;
+            color: #000000;
+            word-break: break-word;
+            font-family: 'Amiri', 'Cairo', 'Segoe UI', serif;
+        }
+
+        /* كلمات قابلة للنقر */
+        .clickable-word {
+            display: inline-block;
+            background: #eef2ff;
+            padding: 0.1rem 0.3rem;
+            margin: 0 0.1rem;
+            border-radius: 0.6rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 500;
+            border: 1px solid #cbd5e1;
+            white-space: nowrap;
+            color: #1e293b;
+        }
+
+        @media (max-width: 550px) {
+            .clickable-word {
+                white-space: normal;
+                display: inline-block;
+                margin: 2px 1px;
+                padding: 0.1rem 0.4rem;
+            }
+            .sentence-text {
+                font-size: 1.3rem;
+            }
+        }
+
+        .clickable-word:hover {
+            background: #c7d2fe;
+            transform: scale(1.02);
+        }
+
+        .word-selected {
+            background: #ffea9e !important;
+            border: 1px solid #ca8a04 !important;
+            color: #1e293b !important;
+            box-shadow: 0 0 0 2px #fef3c7;
+            font-weight: bold;
+        }
+
+        /* منطقة الإعلام المختارة */
+        .selected-list {
+            margin: 1.8rem 0 1rem 0;
+            background: #f1f5f9;
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .selected-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #334155;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-tag {
+            background: #21417b;
+            color: white;
+            border-radius: 30px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.75rem;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            min-height: 48px;
+        }
+
+        .chip {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            box-shadow: inset 0 0 0 1px #cbd5e1, 0 1px 2px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chip button {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: #dc2626;
+            transition: 0.1s;
+            padding: 0 4px;
+        }
+
+        .chip button:hover {
+            color: #991b1b;
+            transform: scale(1.1);
+        }
+
+        .empty-msg {
+            color: #64748b;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* أزرار التحقق والتالي - كتابة الازرار بالابيض */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #21417b;
+            box-shadow: 0 3px 0 #0f2a4f;
+        }
+
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0f2a4f;
+        }
+
+        .btn-primary:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #475569;
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            box-shadow: 0 3px 0 #0f172a;
+        }
+
+        .btn-secondary:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0f172a;
+        }
+
+        .btn-secondary:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #334155;
+        }
+
+        .feedback {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            background: #f1f5f9;
+            transition: 0.2s;
+        }
+
+        .feedback.correct {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .feedback.wrong {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* إتمام اللعبة */
+        .completion-message {
+            text-align: center;
+            background: white;
+            margin: 1rem 2rem 2rem;
+            padding: 1.2rem;
+            border-radius: 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 1rem;
+            background: #eef2ff;
+            color: #475569;
+        }
+
+        @media (max-width: 580px) {
+            .game-container {
+                border-radius: 1.8rem;
+            }
+            .question-area {
+                padding: 1.2rem;
+            }
+            .sentence-text {
+                font-size: 1.25rem;
+            }
+            .btn {
+                padding: 0.6rem;
+            }
+        }
+
+        /* جميع الأرقام باللون #ffea9e */
+        #currentQ, #totalQ, #scoreValue {
+            color: #ffea9e;
+        }
+        
+        .q-counter, .score-box {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="gameApp">
+    <div class="game-header">
+        <h1>🔍 عَيِّنِ الإعْلَام <span>لعبة المعرفة</span></h1>
+        <div class="sub">انقر على الأسماء العَلَم (المُعَرَّف بالعلمية) في الجملة</div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="q-counter">السؤال <span id="currentQ">1</span> / <span id="totalQ">5</span></div>
+        <div class="score-box">⭐ النقاط <span id="scoreValue">0</span></div>
+        <button class="reset-btn" id="resetGameBtn">🔄 إعادة اللعبة</button>
+    </div>
+
+    <div class="question-area" id="questionArea">
+        <!-- ديناميكي -->
+    </div>
+    <footer>✧ اختر الكلمات التي تمثل أعلامًا (أسماء أشخاص، أماكن، أنهار، مدن) ✧</footer>
+</div>
+
+<script>
+    // --------------------- بيانات اللعبة -------------------------
+    const questionsData = [
+        {
+            text: "قال الله تعالى ( يازكريا إنا نبشرك بغلام اسمه يحيى لم نجعل له من قبل سميا )",
+            correctWords: ["زكريا", "يحيى"],
+        },
+        {
+            text: "هاجر النبي محمد صلى الله عليه و سلم الى المدينة المنورة",
+            correctWords: ["محمد", "المدينة المنورة"]
+        },
+        {
+            text: "يكون دجلة و الفرات شط العرب",
+            correctWords: ["دجلة", "الفرات", "شط العرب"]
+        },
+        {
+            text: "القاهرة عاصمة مصر",
+            correctWords: ["القاهرة", "مصر"]
+        },
+        {
+            text: "بيروت و عمان عاصمتان عربيتان",
+            correctWords: ["بيروت", "عمان"]
+        }
+    ];
+
+    // معالجة أولية: بناء نسخ من الجمل مع تجزئة الكلمات
+    function tokenizeSentence(sentence, compoundWords) {
+        let tempMap = new Map();
+        let modifiedText = sentence;
+        let sortedCompounds = [...compoundWords].sort((a,b) => b.length - a.length);
+        sortedCompounds.forEach((comp, idx) => {
+            let placeholder = `@@COMPOUND${idx}@@`;
+            let regex = new RegExp(`\\b${comp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
+            modifiedText = modifiedText.replace(regex, placeholder);
+            tempMap.set(placeholder, comp);
+        });
+        
+        let rawTokens = modifiedText.split(/(\s+|[،،؛؛!؟()\.,:;:-]+)/g).filter(t => t && t.trim().length > 0);
+        let finalTokens = [];
+        
+        for (let token of rawTokens) {
+            if (token.startsWith("@@COMPOUND")) {
+                finalTokens.push({text: tempMap.get(token), isCompound: true, originalToken: token});
+            } else {
+                if (/^[\s\.,;:!؟()\-]+$/.test(token)) {
+                    finalTokens.push({text: token, clickable: false, isPunct: true});
+                } else {
+                    let subParts = token.split(/(\s+)/g).filter(p => p);
+                    for (let sp of subParts) {
+                        if (sp.trim() === "") {
+                            finalTokens.push({text: sp, clickable: false});
+                        } else if (/^[\p{L}\p{M}]+$/u.test(sp)) {
+                            finalTokens.push({text: sp, clickable: true, word: sp});
+                        } else {
+                            finalTokens.push({text: sp, clickable: false});
+                        }
+                    }
+                }
+            }
+        }
+        
+        let result = [];
+        for (let t of finalTokens) {
+            if (t.isCompound) {
+                result.push({text: t.text, clickable: true, word: t.text, isCompoundWord: true});
+            } else if (t.clickable === true) {
+                result.push({text: t.text, clickable: true, word: t.text});
+            } else if (t.clickable === false) {
+                result.push({text: t.text, clickable: false});
+            } else {
+                if (t.text.trim() && !/^[\s\.,;:!؟()\-]+$/.test(t.text)) {
+                    result.push({text: t.text, clickable: true, word: t.text});
+                } else {
+                    result.push({text: t.text, clickable: false});
+                }
+            }
+        }
+        return result;
+    }
+
+    function buildQuestionTokens(q, index) {
+        let compoundNeeded = q.correctWords.filter(cw => cw.includes(' '));
+        let tokens = tokenizeSentence(q.text, compoundNeeded);
+        return {
+            id: index,
+            textRaw: q.text,
+            correctWordsSet: new Set(q.correctWords.map(w => w.trim())),
+            tokens: tokens,
+            correctList: [...q.correctWords]
+        };
+    }
+
+    // حالة اللعبة العالمية
+    let gameQuestions = [];
+    let currentIndex = 0;
+    let userSelections = [];
+    let questionStatus = [];
+    let totalScore = 0;
+
+    // عناصر DOM
+    let appContainer = document.getElementById("questionArea");
+    let currentQSpan = document.getElementById("currentQ");
+    let totalQSpan = document.getElementById("totalQ");
+    let scoreSpan = document.getElementById("scoreValue");
+    let resetBtn = document.getElementById("resetGameBtn");
+
+    function initGame() {
+        gameQuestions = questionsData.map((q, idx) => buildQuestionTokens(q, idx));
+        currentIndex = 0;
+        totalScore = 0;
+        userSelections = gameQuestions.map(() => []);
+        questionStatus = gameQuestions.map(() => ({ checked: false, isCorrect: false, scoreAdded: false }));
+        updateScoreUI();
+        updateTotalQ();
+        renderCurrentQuestion();
+    }
+
+    function updateScoreUI() {
+        scoreSpan.innerText = totalScore;
+    }
+
+    function updateTotalQ() {
+        totalQSpan.innerText = gameQuestions.length;
+        currentQSpan.innerText = currentIndex + 1;
+    }
+
+    function renderCurrentQuestion() {
+        if (currentIndex >= gameQuestions.length) {
+            renderCompletionScreen();
+            return;
+        }
+        const q = gameQuestions[currentIndex];
+        const selections = userSelections[currentIndex] || [];
+        const status = questionStatus[currentIndex];
+        
+        let tokensHtml = '';
+        q.tokens.forEach(token => {
+            if (token.clickable) {
+                let wordText = token.word || token.text;
+                let isSelected = selections.includes(wordText);
+                let classes = `clickable-word ${isSelected ? 'word-selected' : ''}`;
+                tokensHtml += `<span class="${classes}" data-word="${wordText.replace(/"/g, '&quot;')}">${escapeHtml(wordText)}</span>`;
+            } else {
+                tokensHtml += `<span style="white-space:pre-wrap;">${escapeHtml(token.text)}</span>`;
+            }
+        });
+
+        let chipsHtml = '';
+        if (selections.length === 0) {
+            chipsHtml = '<div class="empty-msg">✨ لم تختر أي علم بعد. انقر على الكلمات أعلاه ✨</div>';
+        } else {
+            selections.forEach(sel => {
+                chipsHtml += `<div class="chip">${escapeHtml(sel)} <button class="remove-chip" data-word="${escapeHtml(sel)}">✖</button></div>`;
+            });
+        }
+
+        let feedbackHtml = '';
+        if (status.checked) {
+            if (status.isCorrect) {
+                feedbackHtml = `<div class="feedback correct">✅ إجابة صحيحة! أحسنت.</div>`;
+            } else {
+                feedbackHtml = `<div class="feedback wrong">❌ ليست كل الأعلام صحيحة. حاول مرة أخرى أو راجع الحل.</div>`;
+            }
+        }
+
+        const isNextDisabled = !(status.checked && status.isCorrect);
+        
+        const html = `
+            <div class="sentence-card">
+                <div class="sentence-text" id="sentenceTokens">
+                    ${tokensHtml}
+                </div>
+                <div class="selected-list">
+                    <div class="selected-title"><span class="badge-tag">📌 الإعلام التي اخترتها</span></div>
+                    <div class="chips-container" id="chipsContainer">
+                        ${chipsHtml}
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="checkAnswerBtn">✔ تحقق من الإجابة</button>
+                    <button class="btn btn-secondary" id="nextQuestionBtn" ${isNextDisabled ? 'disabled' : ''}>➡ التالي</button>
+                </div>
+                ${feedbackHtml}
+                ${!status.checked && selections.length>0 ? '<div class="feedback" style="background:#f1f5f9;">🔔 اضغط تحقق لتقييم اختياراتك</div>' : ''}
+                ${!status.checked && selections.length===0 ? '<div class="feedback" style="background:#f1f5f9;">👆 انقر على الكلمات التي تعتقد أنها أعلام (أسماء أشخاص، أماكن، أنهار، مدن)</div>' : ''}
+            </div>
+        `;
+        appContainer.innerHTML = html;
+
+        document.querySelectorAll('.clickable-word').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (questionStatus[currentIndex].checked) return;
+                let word = el.getAttribute('data-word');
+                toggleSelectionForCurrent(word);
+            });
+        });
+
+        document.querySelectorAll('.remove-chip').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (questionStatus[currentIndex].checked) return;
+                let word = btn.getAttribute('data-word');
+                removeSelectionForCurrent(word);
+            });
+        });
+
+        const checkBtn = document.getElementById('checkAnswerBtn');
+        if (checkBtn) checkBtn.onclick = () => verifyCurrentQuestion();
+
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        if (nextBtn) nextBtn.onclick = () => goToNextQuestion();
+    }
+
+    function toggleSelectionForCurrent(word) {
+        let selections = [...(userSelections[currentIndex] || [])];
+        if (selections.includes(word)) {
+            const idx = selections.indexOf(word);
+            selections.splice(idx, 1);
+        } else {
+            selections.push(word);
+        }
+        userSelections[currentIndex] = selections;
+        renderCurrentQuestion();
+    }
+
+    function removeSelectionForCurrent(word) {
+        let selections = [...(userSelections[currentIndex] || [])];
+        const idx = selections.indexOf(word);
+        if (idx !== -1) selections.splice(idx, 1);
+        userSelections[currentIndex] = selections;
+        renderCurrentQuestion();
+    }
+
+    function verifyCurrentQuestion() {
+        if (questionStatus[currentIndex].checked && questionStatus[currentIndex].isCorrect) {
+            return;
+        }
+        
+        if (questionStatus[currentIndex].checked && !questionStatus[currentIndex].isCorrect) {
+            questionStatus[currentIndex].checked = false;
+        }
+        
+        const currentQData = gameQuestions[currentIndex];
+        const selectedWords = userSelections[currentIndex] || [];
+        const correctSet = currentQData.correctWordsSet;
+        const selectedSet = new Set(selectedWords);
+        
+        let isAnswerCorrect = true;
+        if (selectedSet.size !== correctSet.size) isAnswerCorrect = false;
+        else {
+            for (let c of correctSet) {
+                if (!selectedSet.has(c)) {
+                    isAnswerCorrect = false;
+                    break;
+                }
+            }
+        }
+        
+        const wasAlreadyScored = questionStatus[currentIndex].scoreAdded;
+        if (isAnswerCorrect && !wasAlreadyScored) {
+            totalScore += 10;
+            questionStatus[currentIndex].scoreAdded = true;
+            questionStatus[currentIndex].isCorrect = true;
+            updateScoreUI();
+        } else if (!isAnswerCorrect) {
+            if (questionStatus[currentIndex].scoreAdded) {
+                totalScore -= 10;
+                questionStatus[currentIndex].scoreAdded = false;
+                updateScoreUI();
+            }
+            questionStatus[currentIndex].isCorrect = false;
+        } else if (isAnswerCorrect && wasAlreadyScored) {
+            questionStatus[currentIndex].isCorrect = true;
+        }
+        questionStatus[currentIndex].checked = true;
+        renderCurrentQuestion();
+    }
+
+    function goToNextQuestion() {
+        if (!questionStatus[currentIndex].checked || !questionStatus[currentIndex].isCorrect) {
+            return;
+        }
+        if (currentIndex + 1 < gameQuestions.length) {
+            currentIndex++;
+            renderCurrentQuestion();
+            updateTotalQ();
+        } else {
+            renderCompletionScreen();
+        }
+    }
+
+    function renderCompletionScreen() {
+        let allDone = gameQuestions.every((_, idx) => questionStatus[idx].isCorrect === true);
+        let message = allDone ? "🎉 مذهل! أكملت جميع الأسئلة بنجاح 🎉" : "🏁 انتهت اللعبة، يمكنك إعادة المحاولة للحصول على النقاط الكاملة 🏁";
+        let finalScoreMsg = `حصلت على ${totalScore} من ${gameQuestions.length * 10}`;
+        appContainer.innerHTML = `
+            <div class="completion-message">
+                <div style="font-size:2rem;">🏆</div>
+                <p>${message}</p>
+                <p style="font-weight:bold;">${finalScoreMsg}</p>
+                <button id="restartFromCompleteBtn" class="btn btn-primary" style="margin-top:16px;">🔄 ابدأ من جديد</button>
+            </div>
+        `;
+        const restartBtn = document.getElementById('restartFromCompleteBtn');
+        if (restartBtn) restartBtn.onclick = () => { initGame(); };
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    resetBtn.addEventListener('click', () => {
+        initGame();
+    });
+
+    initGame();
+</script>
+</body>
+</html>
