@@ -22,7 +22,6 @@
             padding: 1.5rem;
         }
 
-        /* حاوية اللعبة الرئيسية */
         .game-container {
             max-width: 1100px;
             width: 100%;
@@ -33,7 +32,6 @@
             transition: all 0.2s;
         }
 
-        /* رأس اللعبة - اللون #21417b */
         .game-header {
             background: #21417b;
             padding: 1.2rem 2rem;
@@ -71,7 +69,6 @@
             color: #e2e8f0;
         }
 
-        /* لوحة النقاط والتقدم - اللون #1e293b */
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -90,15 +87,12 @@
             font-weight: bold;
             font-size: 1.2rem;
             box-shadow: inset 0 1px 1px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1);
+            color: white;
         }
 
         .score-box span, .q-counter span {
             color: #ffea9e;
             margin-left: 6px;
-        }
-
-        .score-box, .q-counter {
-            color: white;
         }
 
         .reset-btn {
@@ -120,7 +114,6 @@
             box-shadow: 0 1px 0 #ca8a04;
         }
 
-        /* محتوى السؤال */
         .question-area {
             padding: 2rem 2rem 1rem 2rem;
         }
@@ -133,10 +126,9 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* كتابة الاسئلة بالاسود */
         .sentence-text {
             font-size: 1.7rem;
-            line-height: 1.5;
+            line-height: 1.9;
             text-align: center;
             font-weight: 500;
             color: #000000;
@@ -144,12 +136,11 @@
             font-family: 'Amiri', 'Cairo', 'Segoe UI', serif;
         }
 
-        /* كلمات قابلة للنقر */
         .clickable-word {
             display: inline-block;
             background: #eef2ff;
             padding: 0.1rem 0.3rem;
-            margin: 0 0.1rem;
+            margin: 0 0.15rem;
             border-radius: 0.6rem;
             cursor: pointer;
             transition: all 0.15s;
@@ -184,7 +175,21 @@
             font-weight: bold;
         }
 
-        /* منطقة الإعلام المختارة */
+        /* بعد التحقق: لون الكلمات الصحيحة والخاطئة */
+        .word-correct-highlight {
+            background: #bbf7d0 !important;
+            border: 1px solid #16a34a !important;
+            color: #14532d !important;
+            font-weight: bold;
+        }
+
+        .word-wrong-highlight {
+            background: #fecaca !important;
+            border: 1px solid #dc2626 !important;
+            color: #7f1d1d !important;
+            font-weight: bold;
+        }
+
         .selected-list {
             margin: 1.8rem 0 1rem 0;
             background: #f1f5f9;
@@ -254,7 +259,6 @@
             font-size: 0.9rem;
         }
 
-        /* أزرار التحقق والتالي - كتابة الازرار بالابيض */
         .action-buttons {
             display: flex;
             justify-content: space-between;
@@ -331,7 +335,22 @@
             color: #991b1b;
         }
 
-        /* إتمام اللعبة */
+        /* منطقة الإجابة الصحيحة عند الخطأ */
+        .correct-answer-reveal {
+            margin-top: 10px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 1.2rem;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.95rem;
+            color: #1e40af;
+            text-align: center;
+        }
+
+        .correct-answer-reveal strong {
+            color: #1d4ed8;
+        }
+
         .completion-message {
             text-align: center;
             background: white;
@@ -365,13 +384,8 @@
             }
         }
 
-        /* جميع الأرقام باللون #ffea9e */
         #currentQ, #totalQ, #scoreValue {
             color: #ffea9e;
-        }
-        
-        .q-counter, .score-box {
-            color: white;
         }
     </style>
 </head>
@@ -389,25 +403,24 @@
         <button class="reset-btn" id="resetGameBtn">🔄 إعادة اللعبة</button>
     </div>
 
-    <div class="question-area" id="questionArea">
-        <!-- ديناميكي -->
-    </div>
+    <div class="question-area" id="questionArea"></div>
     <footer>✧ اختر الكلمات التي تمثل أعلامًا (أسماء أشخاص، أماكن، أنهار، مدن) ✧</footer>
 </div>
 
 <script>
-    // --------------------- بيانات اللعبة -------------------------
+    // ===================== بيانات الأسئلة =====================
+    // إصلاح 1: "يا زكريا" منفصلتان حتى تُكتشف كلمة "زكريا" بشكل صحيح
     const questionsData = [
         {
-            text: "قال الله تعالى ( يازكريا إنا نبشرك بغلام اسمه يحيى لم نجعل له من قبل سميا )",
-            correctWords: ["زكريا", "يحيى"],
+            text: "قال الله تعالى ( يا زكريا إنا نبشرك بغلام اسمه يحيى لم نجعل له من قبل سميا )",
+            correctWords: ["زكريا", "يحيى"]
         },
         {
-            text: "هاجر النبي محمد صلى الله عليه و سلم الى المدينة المنورة",
+            text: "هاجر النبي محمد صلى الله عليه وسلم إلى المدينة المنورة",
             correctWords: ["محمد", "المدينة المنورة"]
         },
         {
-            text: "يكون دجلة و الفرات شط العرب",
+            text: "يكوّن دجلة و الفرات شط العرب",
             correctWords: ["دجلة", "الفرات", "شط العرب"]
         },
         {
@@ -420,58 +433,82 @@
         }
     ];
 
-    // معالجة أولية: بناء نسخ من الجمل مع تجزئة الكلمات
+    // ===================== دالة التوكنة المُصلَحة =====================
+    /**
+     * إصلاح 2: استبدال \b بمطابقة بديلة تعمل مع العربية:
+     *   (?<![^\s()] )  →  مسبوقة بمسافة أو بداية النص أو ( 
+     *   (?![^\s),.؟!]) →  تليها مسافة أو نهاية النص أو علامة ترقيم
+     * 
+     * الفكرة: نستبدل الكلمات المركبة بـ placeholder قبل التقسيم،
+     *         ثم نعيد بناء التوكنات مع الحفاظ على الكلمات المركبة ككتلة واحدة.
+     */
     function tokenizeSentence(sentence, compoundWords) {
         let tempMap = new Map();
         let modifiedText = sentence;
-        let sortedCompounds = [...compoundWords].sort((a,b) => b.length - a.length);
+
+        // رتّب الكلمات المركبة من الأطول للأقصر لتجنب التعارض
+        let sortedCompounds = [...compoundWords].sort((a, b) => b.length - a.length);
+
         sortedCompounds.forEach((comp, idx) => {
-            let placeholder = `@@COMPOUND${idx}@@`;
-            let regex = new RegExp(`\\b${comp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
-            modifiedText = modifiedText.replace(regex, placeholder);
+            let placeholder = `CMPD${idx}CMPD`;
+            // regex يعمل مع العربية: حدود طبيعية هي المسافات وعلامات الترقيم
+            let escaped = comp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            // نبحث عن الكلمة المركبة محاطة بمسافة/بداية/نهاية/ترقيم
+            let regex = new RegExp(
+                '(^|[\\s(،؛؟!.,:;)])' + escaped + '($|[\\s)،؛؟!.,:;])',
+                'g'
+            );
+            modifiedText = modifiedText.replace(regex, (match, before, after) => {
+                return before + placeholder + after;
+            });
             tempMap.set(placeholder, comp);
         });
-        
-        let rawTokens = modifiedText.split(/(\s+|[،،؛؛!؟()\.,:;:-]+)/g).filter(t => t && t.trim().length > 0);
-        let finalTokens = [];
-        
-        for (let token of rawTokens) {
-            if (token.startsWith("@@COMPOUND")) {
-                finalTokens.push({text: tempMap.get(token), isCompound: true, originalToken: token});
-            } else {
-                if (/^[\s\.,;:!؟()\-]+$/.test(token)) {
-                    finalTokens.push({text: token, clickable: false, isPunct: true});
-                } else {
-                    let subParts = token.split(/(\s+)/g).filter(p => p);
-                    for (let sp of subParts) {
-                        if (sp.trim() === "") {
-                            finalTokens.push({text: sp, clickable: false});
-                        } else if (/^[\p{L}\p{M}]+$/u.test(sp)) {
-                            finalTokens.push({text: sp, clickable: true, word: sp});
-                        } else {
-                            finalTokens.push({text: sp, clickable: false});
-                        }
-                    }
-                }
-            }
-        }
-        
+
+        // قسّم بالمسافات (مع الاحتفاظ بعلامات الترقيم كمجموعات منفصلة)
+        // نستخدم split بسيط على المسافات ثم نعالج كل كلمة
+        let rawParts = modifiedText.split(/(\s+)/);
+
         let result = [];
-        for (let t of finalTokens) {
-            if (t.isCompound) {
-                result.push({text: t.text, clickable: true, word: t.text, isCompoundWord: true});
-            } else if (t.clickable === true) {
-                result.push({text: t.text, clickable: true, word: t.text});
-            } else if (t.clickable === false) {
-                result.push({text: t.text, clickable: false});
-            } else {
-                if (t.text.trim() && !/^[\s\.,;:!؟()\-]+$/.test(t.text)) {
-                    result.push({text: t.text, clickable: true, word: t.text});
+        for (let part of rawParts) {
+            if (!part) continue;
+
+            // فراغات → غير قابلة للنقر
+            if (/^\s+$/.test(part)) {
+                result.push({ text: part, clickable: false });
+                continue;
+            }
+
+            // placeholder للكلمة المركبة
+            if (tempMap.has(part)) {
+                result.push({ text: tempMap.get(part), clickable: true, word: tempMap.get(part), isCompound: true });
+                continue;
+            }
+
+            // قسّم الكلمة عن علامات الترقيم المُلتصقة (مثل "يازكريا)" أو "(يا")
+            // نستخرج: ترقيم بداية، كلمة، ترقيم نهاية
+            let punctStart = part.match(/^([^\u0600-\u06FF\u0750-\u077Fa-zA-Z0-9]+)/);
+            let punctEnd   = part.match(/([^\u0600-\u06FF\u0750-\u077Fa-zA-Z0-9]+)$/);
+
+            let startPunct = punctStart ? punctStart[1] : '';
+            let endPunct   = punctEnd   ? punctEnd[1]   : '';
+            let core = part.slice(startPunct.length, part.length - endPunct.length);
+
+            if (startPunct) result.push({ text: startPunct, clickable: false });
+
+            if (core) {
+                // تحقق إن كان placeholder مركب
+                if (tempMap.has(core)) {
+                    result.push({ text: tempMap.get(core), clickable: true, word: tempMap.get(core), isCompound: true });
+                } else if (/[\u0600-\u06FFa-zA-Z0-9]/.test(core)) {
+                    result.push({ text: core, clickable: true, word: core });
                 } else {
-                    result.push({text: t.text, clickable: false});
+                    result.push({ text: core, clickable: false });
                 }
             }
+
+            if (endPunct) result.push({ text: endPunct, clickable: false });
         }
+
         return result;
     }
 
@@ -487,118 +524,144 @@
         };
     }
 
-    // حالة اللعبة العالمية
+    // ===================== حالة اللعبة =====================
     let gameQuestions = [];
     let currentIndex = 0;
     let userSelections = [];
     let questionStatus = [];
     let totalScore = 0;
 
-    // عناصر DOM
-    let appContainer = document.getElementById("questionArea");
-    let currentQSpan = document.getElementById("currentQ");
-    let totalQSpan = document.getElementById("totalQ");
-    let scoreSpan = document.getElementById("scoreValue");
-    let resetBtn = document.getElementById("resetGameBtn");
+    let appContainer  = document.getElementById("questionArea");
+    let currentQSpan  = document.getElementById("currentQ");
+    let totalQSpan    = document.getElementById("totalQ");
+    let scoreSpan     = document.getElementById("scoreValue");
+    let resetBtn      = document.getElementById("resetGameBtn");
 
     function initGame() {
-        gameQuestions = questionsData.map((q, idx) => buildQuestionTokens(q, idx));
-        currentIndex = 0;
-        totalScore = 0;
+        gameQuestions  = questionsData.map((q, idx) => buildQuestionTokens(q, idx));
+        currentIndex   = 0;
+        totalScore     = 0;
         userSelections = gameQuestions.map(() => []);
         questionStatus = gameQuestions.map(() => ({ checked: false, isCorrect: false, scoreAdded: false }));
         updateScoreUI();
-        updateTotalQ();
+        updateCounterUI();
         renderCurrentQuestion();
     }
 
-    function updateScoreUI() {
-        scoreSpan.innerText = totalScore;
-    }
-
-    function updateTotalQ() {
-        totalQSpan.innerText = gameQuestions.length;
+    function updateScoreUI()   { scoreSpan.innerText   = totalScore; }
+    function updateCounterUI() {
+        totalQSpan.innerText   = gameQuestions.length;
         currentQSpan.innerText = currentIndex + 1;
     }
 
+    // ===================== رندر السؤال =====================
     function renderCurrentQuestion() {
         if (currentIndex >= gameQuestions.length) {
             renderCompletionScreen();
             return;
         }
-        const q = gameQuestions[currentIndex];
+
+        updateCounterUI();
+
+        const q          = gameQuestions[currentIndex];
         const selections = userSelections[currentIndex] || [];
-        const status = questionStatus[currentIndex];
-        
+        const status     = questionStatus[currentIndex];
+        const correctSet = q.correctWordsSet;
+
+        // --- بناء HTML الكلمات ---
         let tokensHtml = '';
         q.tokens.forEach(token => {
-            if (token.clickable) {
-                let wordText = token.word || token.text;
-                let isSelected = selections.includes(wordText);
-                let classes = `clickable-word ${isSelected ? 'word-selected' : ''}`;
-                tokensHtml += `<span class="${classes}" data-word="${wordText.replace(/"/g, '&quot;')}">${escapeHtml(wordText)}</span>`;
-            } else {
+            if (!token.clickable) {
                 tokensHtml += `<span style="white-space:pre-wrap;">${escapeHtml(token.text)}</span>`;
+                return;
             }
+
+            let wordText  = token.word || token.text;
+            let isSelected = selections.includes(wordText);
+            let extraClass = '';
+
+            // بعد التحقق: لوّن الكلمات
+            if (status.checked) {
+                let isCorrectWord  = correctSet.has(wordText);
+                let isSelectedWord = isSelected;
+
+                if (isSelectedWord && isCorrectWord)  extraClass = 'word-correct-highlight';
+                else if (isSelectedWord && !isCorrectWord) extraClass = 'word-wrong-highlight';
+                else if (!isSelectedWord && isCorrectWord) extraClass = 'word-correct-highlight'; // أبرز الفائتة
+            }
+
+            let classes = `clickable-word ${isSelected ? 'word-selected' : ''} ${extraClass}`;
+            tokensHtml += `<span class="${classes.trim()}" data-word="${wordText.replace(/"/g, '&quot;')}">${escapeHtml(wordText)}</span>`;
         });
 
+        // --- chips المختارة ---
         let chipsHtml = '';
         if (selections.length === 0) {
             chipsHtml = '<div class="empty-msg">✨ لم تختر أي علم بعد. انقر على الكلمات أعلاه ✨</div>';
         } else {
             selections.forEach(sel => {
-                chipsHtml += `<div class="chip">${escapeHtml(sel)} <button class="remove-chip" data-word="${escapeHtml(sel)}">✖</button></div>`;
+                let removeDisabled = status.checked ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : '';
+                chipsHtml += `<div class="chip">${escapeHtml(sel)} <button class="remove-chip" data-word="${escapeHtml(sel)}" ${removeDisabled}>✖</button></div>`;
             });
         }
 
+        // --- feedback ---
         let feedbackHtml = '';
+        let revealHtml   = '';
         if (status.checked) {
             if (status.isCorrect) {
                 feedbackHtml = `<div class="feedback correct">✅ إجابة صحيحة! أحسنت.</div>`;
             } else {
-                feedbackHtml = `<div class="feedback wrong">❌ ليست كل الأعلام صحيحة. حاول مرة أخرى أو راجع الحل.</div>`;
+                feedbackHtml = `<div class="feedback wrong">❌ ليست الإجابة صحيحة تمامًا. حاول مرة أخرى!</div>`;
+                revealHtml   = `<div class="correct-answer-reveal">💡 الأعلام الصحيحة: <strong>${[...correctSet].join(' — ')}</strong></div>`;
+            }
+        } else {
+            if (selections.length > 0) {
+                feedbackHtml = `<div class="feedback" style="background:#f1f5f9;">🔔 اضغط "تحقق" لتقييم اختياراتك</div>`;
+            } else {
+                feedbackHtml = `<div class="feedback" style="background:#f1f5f9;">👆 انقر على الكلمات التي تعتقد أنها أعلام (أسماء أشخاص، أماكن، أنهار، مدن)</div>`;
             }
         }
 
         const isNextDisabled = !(status.checked && status.isCorrect);
-        
-        const html = `
+
+        appContainer.innerHTML = `
             <div class="sentence-card">
-                <div class="sentence-text" id="sentenceTokens">
-                    ${tokensHtml}
-                </div>
+                <div class="sentence-text" id="sentenceTokens">${tokensHtml}</div>
                 <div class="selected-list">
-                    <div class="selected-title"><span class="badge-tag">📌 الإعلام التي اخترتها</span></div>
-                    <div class="chips-container" id="chipsContainer">
-                        ${chipsHtml}
-                    </div>
+                    <div class="selected-title"><span class="badge-tag">📌 الأعلام التي اخترتها</span></div>
+                    <div class="chips-container" id="chipsContainer">${chipsHtml}</div>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-primary" id="checkAnswerBtn">✔ تحقق من الإجابة</button>
-                    <button class="btn btn-secondary" id="nextQuestionBtn" ${isNextDisabled ? 'disabled' : ''}>➡ التالي</button>
+                    <button class="btn btn-primary" id="checkAnswerBtn" ${status.checked && status.isCorrect ? 'disabled' : ''}>✔ تحقق من الإجابة</button>
+                    <button class="btn btn-secondary" id="nextQuestionBtn" ${isNextDisabled ? 'disabled' : ''}>${currentIndex + 1 < gameQuestions.length ? '➡ التالي' : '🏁 إنهاء'}</button>
                 </div>
                 ${feedbackHtml}
-                ${!status.checked && selections.length>0 ? '<div class="feedback" style="background:#f1f5f9;">🔔 اضغط تحقق لتقييم اختياراتك</div>' : ''}
-                ${!status.checked && selections.length===0 ? '<div class="feedback" style="background:#f1f5f9;">👆 انقر على الكلمات التي تعتقد أنها أعلام (أسماء أشخاص، أماكن، أنهار، مدن)</div>' : ''}
+                ${revealHtml}
             </div>
         `;
-        appContainer.innerHTML = html;
 
+        // أحداث الكلمات
         document.querySelectorAll('.clickable-word').forEach(el => {
-            el.addEventListener('click', (e) => {
+            el.addEventListener('click', e => {
                 e.stopPropagation();
-                if (questionStatus[currentIndex].checked) return;
-                let word = el.getAttribute('data-word');
-                toggleSelectionForCurrent(word);
+                if (questionStatus[currentIndex].checked && questionStatus[currentIndex].isCorrect) return;
+                // إذا كان checked وخاطئ، نسمح بإعادة الاختيار (يُعيد التحقق)
+                if (questionStatus[currentIndex].checked && !questionStatus[currentIndex].isCorrect) {
+                    questionStatus[currentIndex].checked = false;
+                }
+                toggleSelectionForCurrent(el.getAttribute('data-word'));
             });
         });
 
         document.querySelectorAll('.remove-chip').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', e => {
                 e.stopPropagation();
-                if (questionStatus[currentIndex].checked) return;
-                let word = btn.getAttribute('data-word');
-                removeSelectionForCurrent(word);
+                if (questionStatus[currentIndex].checked && questionStatus[currentIndex].isCorrect) return;
+                if (questionStatus[currentIndex].checked) {
+                    questionStatus[currentIndex].checked = false;
+                }
+                removeSelectionForCurrent(btn.getAttribute('data-word'));
             });
         });
 
@@ -609,115 +672,97 @@
         if (nextBtn) nextBtn.onclick = () => goToNextQuestion();
     }
 
+    // ===================== منطق الاختيار =====================
     function toggleSelectionForCurrent(word) {
-        let selections = [...(userSelections[currentIndex] || [])];
-        if (selections.includes(word)) {
-            const idx = selections.indexOf(word);
-            selections.splice(idx, 1);
-        } else {
-            selections.push(word);
-        }
-        userSelections[currentIndex] = selections;
+        let sel = [...(userSelections[currentIndex] || [])];
+        let idx = sel.indexOf(word);
+        if (idx !== -1) sel.splice(idx, 1);
+        else sel.push(word);
+        userSelections[currentIndex] = sel;
         renderCurrentQuestion();
     }
 
     function removeSelectionForCurrent(word) {
-        let selections = [...(userSelections[currentIndex] || [])];
-        const idx = selections.indexOf(word);
-        if (idx !== -1) selections.splice(idx, 1);
-        userSelections[currentIndex] = selections;
+        let sel = [...(userSelections[currentIndex] || [])];
+        let idx = sel.indexOf(word);
+        if (idx !== -1) sel.splice(idx, 1);
+        userSelections[currentIndex] = sel;
         renderCurrentQuestion();
     }
 
+    // ===================== التحقق من الإجابة =====================
     function verifyCurrentQuestion() {
-        if (questionStatus[currentIndex].checked && questionStatus[currentIndex].isCorrect) {
-            return;
-        }
-        
-        if (questionStatus[currentIndex].checked && !questionStatus[currentIndex].isCorrect) {
-            questionStatus[currentIndex].checked = false;
-        }
-        
-        const currentQData = gameQuestions[currentIndex];
+        const q            = gameQuestions[currentIndex];
         const selectedWords = userSelections[currentIndex] || [];
-        const correctSet = currentQData.correctWordsSet;
-        const selectedSet = new Set(selectedWords);
-        
-        let isAnswerCorrect = true;
-        if (selectedSet.size !== correctSet.size) isAnswerCorrect = false;
-        else {
+        const correctSet   = q.correctWordsSet;
+        const selectedSet  = new Set(selectedWords.map(w => w.trim()));
+
+        let isCorrect = true;
+        if (selectedSet.size !== correctSet.size) {
+            isCorrect = false;
+        } else {
             for (let c of correctSet) {
-                if (!selectedSet.has(c)) {
-                    isAnswerCorrect = false;
-                    break;
-                }
+                if (!selectedSet.has(c)) { isCorrect = false; break; }
             }
         }
-        
-        const wasAlreadyScored = questionStatus[currentIndex].scoreAdded;
-        if (isAnswerCorrect && !wasAlreadyScored) {
+
+        const wasScored = questionStatus[currentIndex].scoreAdded;
+
+        if (isCorrect && !wasScored) {
             totalScore += 10;
             questionStatus[currentIndex].scoreAdded = true;
-            questionStatus[currentIndex].isCorrect = true;
             updateScoreUI();
-        } else if (!isAnswerCorrect) {
-            if (questionStatus[currentIndex].scoreAdded) {
-                totalScore -= 10;
-                questionStatus[currentIndex].scoreAdded = false;
-                updateScoreUI();
-            }
-            questionStatus[currentIndex].isCorrect = false;
-        } else if (isAnswerCorrect && wasAlreadyScored) {
-            questionStatus[currentIndex].isCorrect = true;
+        } else if (!isCorrect && wasScored) {
+            totalScore -= 10;
+            questionStatus[currentIndex].scoreAdded = false;
+            updateScoreUI();
         }
-        questionStatus[currentIndex].checked = true;
+
+        questionStatus[currentIndex].isCorrect = isCorrect;
+        questionStatus[currentIndex].checked   = true;
         renderCurrentQuestion();
     }
 
+    // ===================== الانتقال للتالي =====================
     function goToNextQuestion() {
-        if (!questionStatus[currentIndex].checked || !questionStatus[currentIndex].isCorrect) {
-            return;
-        }
+        if (!questionStatus[currentIndex].checked || !questionStatus[currentIndex].isCorrect) return;
         if (currentIndex + 1 < gameQuestions.length) {
             currentIndex++;
             renderCurrentQuestion();
-            updateTotalQ();
         } else {
             renderCompletionScreen();
         }
     }
 
+    // ===================== شاشة الإنهاء =====================
     function renderCompletionScreen() {
-        let allDone = gameQuestions.every((_, idx) => questionStatus[idx].isCorrect === true);
-        let message = allDone ? "🎉 مذهل! أكملت جميع الأسئلة بنجاح 🎉" : "🏁 انتهت اللعبة، يمكنك إعادة المحاولة للحصول على النقاط الكاملة 🏁";
-        let finalScoreMsg = `حصلت على ${totalScore} من ${gameQuestions.length * 10}`;
+        let allDone = gameQuestions.every((_, i) => questionStatus[i].isCorrect === true);
+        let message = allDone
+            ? "🎉 مذهل! أكملت جميع الأسئلة بنجاح 🎉"
+            : "🏁 انتهت اللعبة، يمكنك إعادة المحاولة للحصول على النقاط الكاملة 🏁";
+
         appContainer.innerHTML = `
             <div class="completion-message">
-                <div style="font-size:2rem;">🏆</div>
-                <p>${message}</p>
-                <p style="font-weight:bold;">${finalScoreMsg}</p>
-                <button id="restartFromCompleteBtn" class="btn btn-primary" style="margin-top:16px;">🔄 ابدأ من جديد</button>
+                <div style="font-size:2.5rem;">🏆</div>
+                <p style="margin:10px 0;">${message}</p>
+                <p style="font-weight:bold;font-size:1.4rem;color:#21417b;">حصلت على ${totalScore} من ${gameQuestions.length * 10}</p>
+                <button id="restartFromCompleteBtn" class="btn btn-primary" style="margin-top:20px;max-width:240px;">🔄 ابدأ من جديد</button>
             </div>
         `;
-        const restartBtn = document.getElementById('restartFromCompleteBtn');
-        if (restartBtn) restartBtn.onclick = () => { initGame(); };
+        document.getElementById('restartFromCompleteBtn').onclick = () => initGame();
     }
 
+    // ===================== مساعدات =====================
     function escapeHtml(str) {
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
+        if (typeof str !== 'string') return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
-    resetBtn.addEventListener('click', () => {
-        initGame();
-    });
-
+    resetBtn.addEventListener('click', () => initGame());
     initGame();
 </script>
 </body>
